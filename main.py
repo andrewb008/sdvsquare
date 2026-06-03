@@ -1,35 +1,30 @@
 import uasyncio as asyncio
-import gc
+from robot.ackermann import AckermannDrive
+
 
 async def main(zbot):
-    gc.collect()
-    servo = zbot.servo(2)
-    drive = zbot.motor(1)
-    centerAngle = 20
+    drive = AckermannDrive(
+        zbot,
+        drive_motor_port = 2,
+        steering_port = 1,
+        center_angle = 90,
+        min_angle = 45,
+        max_angle = 135,
+    )
 
+    drive.steer_center()
 
-    async def forward(power):
-        servo.angle(centerAngle)
-        await asyncio.sleep_ms(250)
-        drive.on(power)
+    zbot.display("Ackermann", "Forward")
+    drive.drive(50, 90)
+    await asyncio.sleep_ms(1000)
 
-    async def stop():
-        drive.off()
-        await asyncio.sleep_ms(250)
+    drive.stop()
+    drive.steer_center()
+    zbot.display("Ackermann", "Stopped")
 
-
-    servo.angle(centerAngle)
+    drive.drive(50, 135)
+    await asyncio.sleep_ms(1000)
+    drive.stop()
 
     while True:
-
-        # await forward(-100)
-        # asyncio.sleep_ms(2000)
-        # await stop()
-        zbot.display("yo",centerAngle)
-        await asyncio.sleep_ms(2000)
-        for i in range(100):
-            zbot.display("yo",i)
-            asyncio.sleep_ms(100)
-        # forward(-100)
-        zbot.display("yo 1",centerAngle)
-
+        await asyncio.sleep_ms(1000)
